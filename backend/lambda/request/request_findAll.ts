@@ -1,14 +1,15 @@
-import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 const dynamo = new DynamoDBClient({})
 const client = DynamoDBDocumentClient.from(dynamo)
 
 export const handler = async (events: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
   const res = await client.send(
     new ScanCommand({
-      TableName: 'wonder_user'
+      TableName: 'wonder_request'
     })
   )
 
@@ -23,5 +24,6 @@ export const handler = async (events: APIGatewayProxyEvent): Promise<APIGatewayP
     }),
     'isBase64Encoded': false
   }
+
   return response
 }

@@ -1,7 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { v4 } from 'uuid'
 
 const dynamo = new DynamoDBClient({})
 const client = DynamoDBDocumentClient.from(dynamo)
@@ -9,12 +8,36 @@ const client = DynamoDBDocumentClient.from(dynamo)
 export const handler = async (events: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const body = JSON.parse(events.body!)
 
+  const exist = await client.send(
+    new GetCommand({
+      TableName: 'wonder_user',
+      Key: {
+        username: body.username
+      }
+    })
+  )
+
+  if (exist.Item) {
+    const response = {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": "*/*"
+      },
+      "body": JSON.stringify({
+        success: false,
+        error: 'username already exist'
+      }),
+      "isBase64Encoded": false
+    }
+
+    return response
+  }
+
   await client.send(
     new PutCommand({
-      TableName: 'DynamoUsers',
+      TableName: 'wonder_user',
       Item: {
-        id: v4(),
-        username: body.name,
+        username: body.username,
         password: body.password
       },
     })
@@ -28,8 +51,8 @@ export const handler = async (events: APIGatewayProxyEvent): Promise<APIGatewayP
     "body": JSON.stringify({
       success: true,
       body: {
-        username: body.name,
-        password: body.password
+        username: body.username,
+        password: body.password,
       }
     }),
     "isBase64Encoded": false

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_iam" {
-  name = "wonder-iam"
+  name = "lambda-iam"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "dynamodb_lambda_policy" {
         {
            "Effect" : "Allow",
            "Action" : ["dynamodb:*"],
-           "Resource" : "${aws_dynamodb_table.dynamo.arn}"
+           "Resource" : [aws_dynamodb_table.wonder_user.arn, aws_dynamodb_table.wonder_request.arn]
         }
       ]
    })
