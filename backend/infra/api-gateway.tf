@@ -252,6 +252,31 @@ resource "aws_lambda_permission" "awi_gw_request_find_by_id" {
   source_arn = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*"
 }
 
+# [PATCH] /request
+resource "aws_apigatewayv2_integration" "request_update" {
+  api_id = aws_apigatewayv2_api.api_gateway.id
+
+  integration_uri = aws_lambda_function.request_update.invoke_arn
+  integration_type = "AWS_PROXY"
+  integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "request_update" {
+  api_id = aws_apigatewayv2_api.api_gateway.id
+
+  route_key = "PATCH /request"
+  target = "integrations/${aws_apigatewayv2_integration.request_update.id}"
+}
+
+resource "aws_lambda_permission" "api_gw_request_update" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.request_update.function_name
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*"
+}
+
 # cloud watch logs
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.api_gateway.name}"

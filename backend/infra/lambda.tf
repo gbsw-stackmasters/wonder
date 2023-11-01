@@ -141,6 +141,21 @@ resource "aws_lambda_function" "request_find_by_id" {
   role = aws_iam_role.lambda_iam.arn
 }
 
+# request update
+resource "aws_lambda_function" "request_update" {
+  function_name = "request-update"
+
+  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_key = aws_s3_object.lambda_request_update.key
+  layers = [aws_lambda_layer_version.uuid.arn]
+  
+  runtime = "nodejs18.x"
+  handler = "request_update.handler"
+  timeout = 10
+
+  role = aws_iam_role.lambda_iam.arn
+}
+
 # cloudwatch log
 resource "aws_cloudwatch_log_group" "cloud_watch" {
   name = "/aws/lambda/${aws_lambda_function.users_create.function_name}"

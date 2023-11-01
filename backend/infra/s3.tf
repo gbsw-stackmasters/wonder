@@ -181,3 +181,19 @@ resource "aws_s3_object" "lambda_request_find_by_id" {
   source = data.archive_file.lambda_request_find_by_id.output_path
   etag = filemd5(data.archive_file.lambda_request_find_by_id.output_path)
 }
+
+# request update
+data "archive_file" "lambda_request_update" {
+  type = "zip"
+
+  source_file = "../dist/request/request_update.js"
+  output_path = "../build/request/request_update.zip"
+}
+
+resource "aws_s3_object" "lambda_request_update" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  key = "request_update.zip"
+  source = data.archive_file.lambda_request_update.output_path
+  etag = filemd5(data.archive_file.lambda_request_update.output_path)
+}
